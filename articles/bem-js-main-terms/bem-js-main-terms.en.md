@@ -1,9 +1,8 @@
 # JavaScript for BEM: main terms
 
-Stack of BEM technologies contains a block [i-bem](http://bem.github.com/bem-bl/sets/common-desktop/i-bem/i-bem.ru.html).
+Stack of BEM technologies contains a block [i-bem](http://bem.info/technology/i-bem/2.3.0/i-bem-js/).
 
 It's JavaScript implementation uses BEM data domain. The use of this library allows one to manipulate the client-side JavaScript/DOM in *BEM-Style* according to *BEM-Principles*, not only in the design of visible components, but also their behavior.
-
 
 ## Why do we need one more framework?
 
@@ -19,7 +18,6 @@ Principally, all existent JavaScript libraries can be divided into the following
 
 This categorization is not absolute, and probably many libraries answer problems which exist across several categories.  The important thing here is that each of these libraries has been designed with one similar goal; to help us solve our problems.
 
-
 OldSchool designers still remember the good'ol days when nothing like jQuery existed and they had to program everything from scratch.
 Each project had its own `common.js` which included a set of commonly used functions.
 At the beginning of it was a section which would be copy-&-pasted from project to project.  Later these functions might be collected into a small JavaScript library.
@@ -28,7 +26,7 @@ That was the evolution of JavaScript frameworks.
 
 The same thing happened to BEM.  Initially, we understood that we wanted to have these things called `blocks` which were `Interface Modules`, their smaller CSS-elements and modifiers existed only in CSS.  Later developers wanted to work using a similar structure, but this time in JavaScript.  During this time developers also wanted to include the key-concept of `levels` which allows one to build upon and improve the behavior of blocks from project to project.
 
-This is why the JavaScript was written for the *helper block* [i-bem.js](https://github.com/bem/bem-bl/tree/master/blocks-common/i-bem) which lives over at GitHub.  It is the core framework for writing JavaScript in `BEM Terminology`.
+This is why the JavaScript was written for the *helper block* [i-bem](http://bem.info/technology/i-bem/2.3.0/i-bem-js/) which lives over at GitHub.  It is the core framework for writing JavaScript in `BEM Terminology`.
 
 ## Connection with HTML code
 As all JavaScript components, code for `i-bem.js` has to be coupled with some HTML, eventually intended to be the functional code behind some part of an interface.  In order to use `i-bem` all you have to do is add the CSS-Class `i-bem`, and define the `onclick` attribute to contain the parameters of the block.
@@ -59,13 +57,17 @@ The `decl` method is used for describing the block's behaviour, it receives 3 pa
  3. The static properties of the class to which the block belongs.
 
 ```js
-BEM.DOM.decl('myblock', {
+modules.define('myblock', ['i-bem__dom'], function(provide, BEMDOM) {
 
-    /\* Properties specific to this instance \*/
+  provide(BEMDOM.decl(this.name, {
 
-}, {
+        /\* собственные свойства экземпляра \*/
 
-    /\* Static properties specific to the class to which this block belongs \*/
+    }, {
+
+        /\* статические свойства \*/
+
+    }));
 
 });
 ```
@@ -82,15 +84,18 @@ When extending functionality of a current block, a developer always has access t
 In other words, methods can be fully overwritten or they can be extended with additional behavior.
 
 ```js
-BEM.DOM.decl('myblock', {
+modules.define('myblock', ['i-bem__dom'], function(provide, BEMDOM) {
 
-    method: function() {
+    provide(BEMDOM.decl('myblock', {
 
-        this.__base();
-        this.doMore();
+        method: function() {
 
-    }
+            this.__base();
+            this.doMore();
 
+        }
+
+    }));
 });
 ```
 
@@ -171,36 +176,38 @@ this.toggleMod([elem], modName,
 Modifiers describe a block's state.  Every block has `onSetMod` property that specifies what should be done when the block's state is changed.
 
 ```js
-BEM.DOM.decl('myblock', {
-    onSetMod : {
-        'mod1' : {
+modules.define('myblock', ['i-bem__dom'], function(provide, BEMDOM) {
 
-            // Set the value of `mod1` to `val1`
-            'val1' : function(mod, val, oldVal) {
+    provide(BEMDOM.decl('myblock', {
+        onSetMod : {
+            'mod1' : {
+
+                // установка модификатора mod1 в val1
+                'val1' : function(mod, val, oldVal) {
+            },
+            // установка модификатора`mod2` в любое значение
+            'mod2' : function(mod, val, oldVal) {
             }
-
-        },
-
-        // Set the value of the modifier `mod2` to any value
-        'mod2' : function(mod, val, oldVal) {
         }
-    }
+    }));
 });
 ```
 
 We declare modifiers for elements in a similar way:
 
 ```js
-BEM.DOM.decl('myblock', {
+modules.define('myblock', ['i-bem__dom'], function(provide, BEMDOM) {
+
+  provide(BEMDOM.decl('myblock', {
     // …
 
     onElemSetMod : {
 
-        // The same structure as the block
+        // структура, аналогичная блоку
         'elem' : {
             'mod1' : {
 
-                // the additional parameter `elem`
+                // дополнительный параметр `elem`
                 'val1' : function(elem, mod, val, oldVal) {
                 }
 
@@ -208,6 +215,7 @@ BEM.DOM.decl('myblock', {
         }
     }
 
+  }));
 });
 ```
 
@@ -253,6 +261,6 @@ onSetMod : {
 ```
 
 `i-bem` makes possible lazy initialization for the blocks, and creation of blocs without DOM-representation. <br/>
-More information can be found at [the `i-bem` block's page ](http://bem.github.io/bem-bl/sets/common-desktop/i-bem/i-bem.en.html).
+More information can be found at [the `i-bem` block's page ](http://bem.info/technology/i-bem/2.3.0/i-bem-js/).
 
 This article is based on [Vladimir Varankin's](https://github.com/narqo) talk ["BEM and JavaScript: Why Did We Created a JS-framework?"](http://events.yandex.ru/events/yasubbotnik/msk-sep-2012/talks/323/) that was presented at Ya.Subbotnik (Yandex Developer's Day) in Moscow September 8, 2012.
